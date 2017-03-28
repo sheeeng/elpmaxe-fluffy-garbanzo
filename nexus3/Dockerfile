@@ -62,7 +62,9 @@ RUN sed \
     -e '/^nexus-context/ s:$:${NEXUS_CONTEXT}:' \
     -i ${NEXUS_HOME}/etc/nexus-default.properties
 
-RUN useradd -r -u 200 -m -c "nexus role account" -d ${NEXUS_DATA} -s /bin/false nexus \
+# Add group first before add user, otherwise fail.
+RUN groupadd -g 200 nexus \
+  && useradd -r -u 200 -g 200 -m -c "nexus role account" -d ${NEXUS_DATA} -s /bin/false nexus \
   && mkdir -p ${NEXUS_DATA}/etc ${NEXUS_DATA}/log ${NEXUS_DATA}/tmp ${SONATYPE_WORK} \
   && ln -s ${NEXUS_DATA} ${SONATYPE_WORK}/nexus3 \
   && chown -R nexus:nexus ${NEXUS_DATA}
